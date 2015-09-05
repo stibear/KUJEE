@@ -1,0 +1,45 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#|
+exec ros -Q -- $0 "$@"
+|#
+(require 'cl-emb)
+
+(defconstant +default-margin+ 2)
+
+(defun column-draw (lines x)
+  (apply #'concatenate
+         'string
+         (format nil "~%\\draw (~Dcm,0cm) rectangle (~D,14cm);~%"
+                 (- x) (- (+ x lines)))
+         (when (> lines 1)
+           (loop :for i :below (1- lines)
+                 :collect
+                 (format nil "\\draw[dashed] (~Dcm,0cm) -- (~:*~Dcm,14cm);~%"
+                         (- (+ x i 1)))))))
+
+(defun make-column (lines-lst x margin)
+  (if (null (cdr lines-lst))
+      (column-draw (car lines-lst) x)
+      (concatenate
+       'string
+       (column-draw (car lines-lst) x)
+       (make-column (cdr lines-lst) (+ (car lines-lst) x margin) margin))))
+
+(defun main (&rest argv)
+  (declare (ignorable argv))
+  (let* ((margin (member "--margin" argv :test #'string=))
+         (argv (mapcar #'read-from-string (set-difference argv margin))))
+    (with-open-file (file #P"main.tex"
+                          :direction :output
+                          :if-exists :supersede
+                          :if-does-not-exist :create)
+      (princ
+       (emb:execute-emb
+        #P"template.tex"
+        :env `(:column ,(make-column argv 0
+                                     (if margin
+                                         (read-from-string (cadr margin))
+                                         +default-margin+))))
+;       :stream file
+       ))))

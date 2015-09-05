@@ -1,0 +1,28 @@
+\documentclass[a4paper,landscape,notitlepage]{article}
+\usepackage{tikz}
+\usepackage[utf8]{inputenc}
+\pagestyle{empty}
+\usetikzlibrary{calc,positioning}
+
+\title{}
+\author{}
+\date{}
+
+\begin{document}
+\thispagestyle{empty}
+\headheight 0pt
+\topmargin 0pt
+\headsep 0pt
+\tikzset{just here/.style = {above right,inner sep=0mm}}
+
+\begin{tikzpicture}[remember picture]
+\useasboundingbox (0,0);
+\begin{scope}[shift={($(current page.south east) + (135:5)$)}]
+
+<% @var column %>
+
+\end{scope}
+
+\end{tikzpicture}
+
+\end{document}
