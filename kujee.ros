@@ -26,10 +26,15 @@ exec ros -Q -- $0 "$@"
        (column-draw (car lines-lst) x)
        (make-column (cdr lines-lst) (+ (car lines-lst) x margin) margin))))
 
+(defun list-diff (diffee differ)
+  (loop :for i :in diffee
+        :until (string= i (car differ))
+        :collect i))
+
 (defun main (&rest argv)
   (declare (ignorable argv))
   (let* ((margin (member "--margin" argv :test #'string=))
-         (argv (mapcar #'read-from-string (set-difference argv margin))))
+         (argv (mapcar #'read-from-string (list-diff argv margin))))
     (with-open-file (file #P"main.tex"
                           :direction :output
                           :if-exists :supersede
